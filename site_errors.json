@@ -1,11 +1,326 @@
 {
-    "timestamp": "2026-07-09T11:26:07.908802",
-    "page_errors": [
+    "timestamp": "2026-07-09T13:55:34.586181",
+    "page_errors": [],
+    "resource_errors": [
         {
-            "url": "https://comite-ethique.cnrs.fr/",
-            "error": "Request failed: HTTPSConnectionPool(host='comite-ethique.cnrs.fr', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:997)')))"
+            "page": "https://www.cnrs.fr/comitenational/",
+            "resource_url": "https://www.cnrs.fr/js/jquery-2.2.2.min.js",
+            "resource_type": "js",
+            "status_code": 404
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "resource_url": "https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js",
+            "resource_type": "js",
+            "status_code": 404
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "resource_url": "http://use.edgefonts.net/alex-brush:n4:default;allan:n7:default.js",
+            "resource_type": "js",
+            "status_code": 403
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "resource_url": "https://www.cnrs.fr/js/jquery-2.2.2.min.js",
+            "resource_type": "js",
+            "status_code": 404
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "resource_url": "https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js",
+            "resource_type": "js",
+            "status_code": 404
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "resource_url": "http://use.edgefonts.net/alex-brush:n4:default;allan:n7:default.js",
+            "resource_type": "js",
+            "status_code": 403
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/english/UK_acc.htm",
+            "resource_url": "http://use.edgefonts.net/alex-brush:n4:default;allan:n7:default.js",
+            "resource_type": "js",
+            "status_code": 403
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/english/UK_acc.htm",
+            "resource_url": "https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js",
+            "resource_type": "js",
+            "status_code": 404
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "resource_url": "http://use.edgefonts.net/alex-brush:n4:default;allan:n7:default.js",
+            "resource_type": "js",
+            "status_code": 403
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "resource_url": "https://www.cnrs.fr/js/jquery-2.2.2.min.js",
+            "resource_type": "js",
+            "status_code": 404
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "resource_url": "https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js",
+            "resource_type": "js",
+            "status_code": 404
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm",
+            "resource_url": "http://use.edgefonts.net/alex-brush:n4:default;allan:n7:default.js",
+            "resource_type": "js",
+            "status_code": 403
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm",
+            "resource_url": "https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js",
+            "resource_type": "js",
+            "status_code": 404
         }
     ],
-    "resource_errors": [],
-    "console_errors": []
+    "console_errors": [
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/ - Refused to apply style from 'https://www.cnrs.fr/css/bootstrap.min.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/ - Refused to apply style from 'https://www.cnrs.fr/comitenational/css/test2.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/js/jquery-2.2.2.min.js - Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/ - Refused to execute script from 'https://www.cnrs.fr/js/jquery-2.2.2.min.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js - Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/ - Refused to apply style from 'https://www.cnrs.fr/css/bootstrap.min.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/ - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/' was loaded over HTTPS, but requested an insecure script 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/ - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/' was loaded over HTTPS, but requested an insecure script 'http://use.edgefonts.net/alex-brush:n4:default;allan:n7:default.js'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/ 435 Refused to apply style from 'https://www.cnrs.fr/comitenational/css/test2.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/ - Refused to execute script from 'https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/ 453 Mixed Content: The page at 'https://www.cnrs.fr/comitenational/' was loaded over HTTPS, but requested an insecure stylesheet 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/ - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/' was loaded over HTTPS, but requested an insecure script 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/favicon.ico - Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/accueil.html 0 Refused to apply style from 'https://www.cnrs.fr/css/bootstrap.min.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/js/jquery-2.2.2.min.js - Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/accueil.html - Refused to execute script from 'https://www.cnrs.fr/js/jquery-2.2.2.min.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/accueil.html - Refused to apply style from 'https://www.cnrs.fr/css/bootstrap.min.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/accueil.html - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/accueil.html' was loaded over HTTPS, but requested an insecure script 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/accueil.html - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/accueil.html' was loaded over HTTPS, but requested an insecure script 'http://use.edgefonts.net/alex-brush:n4:default;allan:n7:default.js'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/accueil.html 454 Refused to apply style from 'https://www.cnrs.fr/comitenational/css/test2.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js - Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/accueil.html - Refused to execute script from 'https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/accueil.html 472 Mixed Content: The page at 'https://www.cnrs.fr/comitenational/accueil.html' was loaded over HTTPS, but requested an insecure stylesheet 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/accueil.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/accueil.html - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/accueil.html' was loaded over HTTPS, but requested an insecure script 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/english/UK_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/english/UK_acc.htm - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/english/UK_acc.htm' was loaded over HTTPS, but requested an insecure script 'http://use.edgefonts.net/alex-brush:n4:default;allan:n7:default.js'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/english/UK_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/english/UK_acc.htm - Refused to apply style from 'https://www.cnrs.fr/comitenational/css/test2.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/english/UK_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js - Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/english/UK_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/english/UK_acc.htm - Refused to execute script from 'https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/english/UK_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/english/UK_acc.htm 218 Mixed Content: The page at 'https://www.cnrs.fr/comitenational/english/UK_acc.htm' was loaded over HTTPS, but requested an insecure stylesheet 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/english/UK_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/english/UK_acc.htm - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/english/UK_acc.htm' was loaded over HTTPS, but requested an insecure script 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/english/UK_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/english/UK_acc.htm 236 Refused to apply style from 'https://www.cnrs.fr/comitenational/css/test2.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/CN.html 0 Refused to apply style from 'https://www.cnrs.fr/css/bootstrap.min.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/js/jquery-2.2.2.min.js - Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/CN.html - Refused to execute script from 'https://www.cnrs.fr/js/jquery-2.2.2.min.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/CN.html - Refused to apply style from 'https://www.cnrs.fr/css/bootstrap.min.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/CN.html - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/CN.html' was loaded over HTTPS, but requested an insecure script 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/CN.html - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/CN.html' was loaded over HTTPS, but requested an insecure script 'http://use.edgefonts.net/alex-brush:n4:default;allan:n7:default.js'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/CN.html 150 Refused to apply style from 'https://www.cnrs.fr/comitenational/css/test2.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js - Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/CN.html - Refused to execute script from 'https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/CN.html 168 Mixed Content: The page at 'https://www.cnrs.fr/comitenational/CN.html' was loaded over HTTPS, but requested an insecure stylesheet 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/CN.html",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/CN.html - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/CN.html' was loaded over HTTPS, but requested an insecure script 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/cs/cs_acc.htm' was loaded over HTTPS, but requested an insecure script 'http://use.edgefonts.net/alex-brush:n4:default;allan:n7:default.js'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm 56 Refused to apply style from 'https://www.cnrs.fr/comitenational/css/test2.css' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js - Failed to load resource: the server responded with a status of 404 ()"
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm - Refused to execute script from 'https://www.cnrs.fr/comitenational/js/jquery-2.2.2.min.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm 74 Mixed Content: The page at 'https://www.cnrs.fr/comitenational/cs/cs_acc.htm' was loaded over HTTPS, but requested an insecure stylesheet 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'. This request has been blocked; the content must be served over HTTPS."
+        },
+        {
+            "page": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm",
+            "level": "SEVERE",
+            "message": "https://www.cnrs.fr/comitenational/cs/cs_acc.htm - Mixed Content: The page at 'https://www.cnrs.fr/comitenational/cs/cs_acc.htm' was loaded over HTTPS, but requested an insecure script 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'. This request has been blocked; the content must be served over HTTPS."
+        }
+    ]
 }

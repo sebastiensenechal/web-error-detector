@@ -16,10 +16,12 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+import time
 
 # --- Configuration ---
-START_URL = "https://www.cnrs.fr/fr"  # À adapter
-MAX_PAGES = 10  # Nombre max de pages à crawler
+START_URL = "https://www.cnrs.fr/fr/"  # À adapter
+MAX_PAGES = 20  # Nombre max de pages à crawler
+
 
 # --- Fonction pour nettoyer les URLs (supprimer ancres et paramètres) ---
 def clean_url(url):
@@ -43,10 +45,10 @@ def get_selenium_driver():
     options = Options()
     options.binary_location = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
     options.add_argument("--headless")  # Mode sans interface
-    options.add_argument("--disable-gpu")
+    #options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--log-level=3")  # Réduit les logs inutiles
+    #options.add_argument("--disable-dev-shm-usage")
+    #options.add_argument("--log-level=3")  # Réduit les logs inutiles
     
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=options)
@@ -55,116 +57,120 @@ def get_selenium_driver():
 
 # --- 1. Crawler le site et détecter les erreurs 5xx sur les pages ---
 def crawl_site(start_url, max_pages=MAX_PAGES):
-    """
-    Crawle un site et détecte les erreurs 5xx sur les pages.
-    Retourne : (liste des pages valides, liste des erreurs 5xx sur les pages)
-    """
-    visited = set()
-    to_visit = [clean_url(start_url)]  # Nettoyage de l'URL de départ
+    """Crawle le site et détecte les erreurs 5xx sur les pages."""
     pages = []
-    page_errors = []  # (url, code_erreur)
-    
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"}
+    page_errors = []
+    visited = set()
+    to_visit = [start_url]
     
     while to_visit and len(pages) < max_pages:
-        url = to_visit.pop(0)
-        if url in visited:
+        current_url = to_visit.pop(0)
+        if current_url in visited:
             continue
-        visited.add(url)
         
         try:
-            response = requests.get(url, headers=headers, timeout=10, allow_redirects=True)
-            
-            # Détection des erreurs 5xx
-            if 500 <= response.status_code < 600:
-                page_errors.append((url, f"HTTP {response.status_code}"))
-                continue  # On ne traite pas cette page
-            
-            # Si la page est valide, on l'ajoute à la liste
-            pages.append(url)
-            
-            # Extraction des liens pour continuer le crawl
-            soup = BeautifulSoup(response.text, 'html.parser')
-            for link in soup.find_all('a', href=True):
-                next_url = urljoin(url, link['href'])
-                next_url = clean_url(next_url)  # Nettoyage de l'URL
-                # On ne suit que les liens internes et non visités
-                if (next_url.startswith(start_url) and 
-                    next_url not in visited and 
-                    urlparse(next_url).netloc == urlparse(start_url).netloc):
-                    to_visit.append(next_url)
-                    
-        except requests.RequestException as e:
-            page_errors.append((url, f"Request failed: {str(e)}"))
+            response = requests.get(current_url, timeout=10, allow_redirects=True)
+            if response.status_code >= 500:
+                page_errors.append((current_url, f"HTTP {response.status_code}"))
+            else:
+                pages.append(current_url)
+                visited.add(current_url)
+                soup = BeautifulSoup(response.text, 'html.parser')
+                for link in soup.find_all('a', href=True):
+                    next_url = urljoin(current_url, link['href'])
+                    next_url = clean_url(next_url)
+                    if next_url.startswith(start_url) and next_url not in visited:
+                        to_visit.append(next_url)
+        except requests.exceptions.RequestException as e:
+            page_errors.append((current_url, f"Request failed: {str(e)}"))
     
     return pages, page_errors
 
 
-# --- 2. Vérifier les ressources (JS, CSS, images) et détecter les erreurs 4xx/5xx + erreurs console ---
+# --- 2. Vérifier les ressources et les erreurs console ---
 def check_resources_and_console(page_url, driver):
-    """
-    Vérifie les ressources (JS, CSS, images) d'une page et capture les erreurs console.
-    Retourne : (liste des erreurs sur les ressources, liste des erreurs console)
-    """
+    """Vérifie les erreurs console et les erreurs 4xx/5xx sur les ressources d'une page."""
     resource_errors = []
     console_errors = []
-    
+
     try:
-        # Charger la page avec Selenium
         driver.get(page_url)
-        
-        # Récupérer les logs de la console
+        # Attendre que les ressources soient chargées
+        time.sleep(2)  # À ajuster selon la vitesse du site
+
+        # --- NOUVEAU : Scroll jusqu'en bas de la page ---
+        last_height = driver.execute_script("return document.body.scrollHeight")
+        while True:
+            # Scroll jusqu'en bas
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(1)  # Attendre le chargement des nouvelles ressources
+            # Calculer la nouvelle hauteur et comparer
+            new_height = driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                break  # On a atteint le bas
+            last_height = new_height
+
+        # --- 1. Récupérer les erreurs console ---
         logs = driver.get_log("browser")
         for log in logs:
-            if log["level"] == "SEVERE":
-                console_errors.append({"page": page_url, "error": log["message"]})
-        
-        # Récupérer toutes les ressources (JS, CSS, images) depuis le DOM
-        resources = []
-        
-        # JS
+            if log["level"] in ["SEVERE", "ERROR", "WARNING"]:
+                console_errors.append({
+                    "page": page_url,
+                    "level": log["level"],
+                    "message": log["message"]
+                })
+
+        # --- 2. Récupérer les ressources (JS, CSS, images) ---
+        resources = set()
+        # Scripts JS
         js_scripts = driver.find_elements("tag name", "script")
         for script in js_scripts:
             src = script.get_attribute("src")
             if src:
-                resources.append((src, "js"))
-        
-        # CSS
-        css_links = driver.find_elements("tag name", "link")
+                resources.add((src, "js"))
+
+        # Feuille de style CSS
+        css_links = driver.find_elements("tag name", "style")
         for link in css_links:
             href = link.get_attribute("href")
             if href and "css" in link.get_attribute("rel"):
-                resources.append((href, "css"))
-        
+                resources.add((href, "css"))
+
         # Images
         images = driver.find_elements("tag name", "img")
         for img in images:
             src = img.get_attribute("src")
             if src:
-                resources.append((src, "image"))
-        
-        # Vérifier le statut HTTP de chaque ressource
+                resources.add((src, "image"))
+
+        # --- 3. Vérifier le statut HTTP de chaque ressource ---
         for resource_url, resource_type in resources:
             try:
-                response = requests.head(resource_url, timeout=5, allow_redirects=True)
-                if 400 <= response.status_code < 600:
+                response = requests.head(
+                    resource_url,
+                    timeout=5,
+                    allow_redirects=True,
+                    verify=True,  # Vérification SSL
+                    headers={"User-Agent": "Mozilla/5.0"}
+                )
+                if response.status_code >= 400:
                     resource_errors.append({
-                        "page_url": page_url,
+                        "page": page_url,
                         "resource_url": resource_url,
-                        "type": resource_type,
-                        "error": f"HTTP {response.status_code}"
+                        "resource_type": resource_type,
+                        "status_code": response.status_code
                     })
-            except requests.RequestException as e:
+            except requests.exceptions.RequestException as e:
                 resource_errors.append({
-                    "page_url": page_url,
+                    "page": page_url,
                     "resource_url": resource_url,
-                    "type": resource_type,
-                    "error": f"Request failed: {str(e)}"
+                    "resource_type": resource_type,
+                    "error": str(e)
                 })
-                
+
     except Exception as e:
-        console_errors.append({"page": page_url, "error": f"Selenium error: {str(e)}"})
-    
+        print(f"Erreur lors de la vérification de {page_url}: {e}")
+
     return resource_errors, console_errors
 
 
