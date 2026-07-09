@@ -1,9 +1,28 @@
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.firefox import GeckoDriverManager
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 import time
-import re
 import csv
+import re
+from datetime import datetime
+
+# Configuration de Selenium
+def get_driver():
+    # Configuration des options pour Firefox
+    options = FirefoxOptions()
+    options.add_argument("--headless")  # Mode sans interface
+    options.set_capability("goog:loggingPrefs", {"browser": "ALL"})
+
+    # Initialisation du driver Firefox
+    driver = webdriver.Firefox(
+        service=FirefoxService(GeckoDriverManager().install()),
+        options=options
+    )
+    return driver
 
 # Configuration
 BASE_URL = "https://insb.cnrs.fr"  # Remplace par l'URL de ton site
