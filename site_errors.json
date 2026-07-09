@@ -1,0 +1,11 @@
+{
+    "timestamp": "2026-07-09T11:26:07.908802",
+    "page_errors": [
+        {
+            "url": "https://comite-ethique.cnrs.fr/",
+            "error": "Request failed: HTTPSConnectionPool(host='comite-ethique.cnrs.fr', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:997)')))"
+        }
+    ],
+    "resource_errors": [],
+    "console_errors": []
+}

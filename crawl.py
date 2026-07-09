@@ -1,140 +1,220 @@
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from webdriver_manager.firefox import GeckoDriverManager
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Script pour crawler un site, détecter les erreurs 5xx sur les pages,
+les erreurs 4xx/5xx sur les ressources (JS, CSS, images) et capturer les erreurs console.
+Résultats exportés en JSON.
+Nettoyage des URLs : suppression des ancres (#) et paramètres (?).
+"""
+
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-import time
-import csv
-import re
+from urllib.parse import urljoin, urlparse, urlunparse
+import json
 from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 
-# Configuration de Selenium
-def get_driver():
-    # Configuration des options pour Firefox
-    options = FirefoxOptions()
+# --- Configuration ---
+START_URL = "https://www.cnrs.fr/fr"  # À adapter
+MAX_PAGES = 10  # Nombre max de pages à crawler
+
+# --- Fonction pour nettoyer les URLs (supprimer ancres et paramètres) ---
+def clean_url(url):
+    """Supprime les ancres (#) et paramètres (?) d'une URL."""
+    parsed = urlparse(url)
+    # On garde seulement le schéma, le domaine et le chemin
+    cleaned = urlunparse((
+        parsed.scheme,
+        parsed.netloc,
+        parsed.path,
+        '',  # params
+        '',  # query
+        ''   # fragment (ancre)
+    ))
+    return cleaned
+
+
+# --- Configuration Selenium ---
+def get_selenium_driver():
+    """Configure et retourne un driver Selenium avec Chrome."""
+    options = Options()
+    options.binary_location = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
     options.add_argument("--headless")  # Mode sans interface
-    options.set_capability("goog:loggingPrefs", {"browser": "ALL"})
-
-    # Initialisation du driver Firefox
-    driver = webdriver.Firefox(
-        service=FirefoxService(GeckoDriverManager().install()),
-        options=options
-    )
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--log-level=3")  # Réduit les logs inutiles
+    
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=options)
     return driver
 
-# Configuration
-BASE_URL = "https://insb.cnrs.fr"  # Remplace par l'URL de ton site
-START_PATH = "/fr"                # Page de départ
-MAX_PAGES = 100                  # Limite pour éviter un crawl infini
-DELAY = 1                        # Délai entre les requêtes (en secondes)
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 
-# Extensions et motifs à exclure
-EXCLUDED_EXTENSIONS = {'.pdf', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.doc', '.docx', '.xls', '.xlsx', '.zip'}
-EXCLUDED_PATTERNS = [r'\?', r'\#', r'/admin/', r'/login/', r'/user/']
+# --- 1. Crawler le site et détecter les erreurs 5xx sur les pages ---
+def crawl_site(start_url, max_pages=MAX_PAGES):
+    """
+    Crawle un site et détecte les erreurs 5xx sur les pages.
+    Retourne : (liste des pages valides, liste des erreurs 5xx sur les pages)
+    """
+    visited = set()
+    to_visit = [clean_url(start_url)]  # Nettoyage de l'URL de départ
+    pages = []
+    page_errors = []  # (url, code_erreur)
+    
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"}
+    
+    while to_visit and len(pages) < max_pages:
+        url = to_visit.pop(0)
+        if url in visited:
+            continue
+        visited.add(url)
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=10, allow_redirects=True)
+            
+            # Détection des erreurs 5xx
+            if 500 <= response.status_code < 600:
+                page_errors.append((url, f"HTTP {response.status_code}"))
+                continue  # On ne traite pas cette page
+            
+            # Si la page est valide, on l'ajoute à la liste
+            pages.append(url)
+            
+            # Extraction des liens pour continuer le crawl
+            soup = BeautifulSoup(response.text, 'html.parser')
+            for link in soup.find_all('a', href=True):
+                next_url = urljoin(url, link['href'])
+                next_url = clean_url(next_url)  # Nettoyage de l'URL
+                # On ne suit que les liens internes et non visités
+                if (next_url.startswith(start_url) and 
+                    next_url not in visited and 
+                    urlparse(next_url).netloc == urlparse(start_url).netloc):
+                    to_visit.append(next_url)
+                    
+        except requests.RequestException as e:
+            page_errors.append((url, f"Request failed: {str(e)}"))
+    
+    return pages, page_errors
 
-# Stockage des résultats
-visited_urls = set()
-error_5xx_urls = []
 
-# Fonction pour vérifier si une URL doit être exclue
-def should_exclude(url):
-    # Vérifier les motifs (paramètres, ancres, chemins interdits)
-    for pattern in EXCLUDED_PATTERNS:
-        if re.search(pattern, url, re.IGNORECASE):
-            return True
-
-    # Vérifier les extensions dans le chemin ou la query
-    parsed = urlparse(url)
-    path = parsed.path.lower()
-    query = parsed.query.lower()
-
-    # Vérifier si le chemin ou la query se termine par une extension exclue
-    for ext in EXCLUDED_EXTENSIONS:
-        if path.endswith(ext) or query.endswith(ext):
-            return True
-
-    return False
-
-# Fonction pour vérifier si une URL est interne au site
-def is_internal(url, base_url):
-    return urlparse(url).netloc == urlparse(base_url).netloc
-
-# Fonction pour crawler une page
-def crawl_page(url):
+# --- 2. Vérifier les ressources (JS, CSS, images) et détecter les erreurs 4xx/5xx + erreurs console ---
+def check_resources_and_console(page_url, driver):
+    """
+    Vérifie les ressources (JS, CSS, images) d'une page et capture les erreurs console.
+    Retourne : (liste des erreurs sur les ressources, liste des erreurs console)
+    """
+    resource_errors = []
+    console_errors = []
+    
     try:
-        headers = {"User-Agent": USER_AGENT}
-        response = requests.get(url, headers=headers, timeout=10, allow_redirects=True)
-        return response.status_code, response.text
-    except requests.RequestException as e:
-        print(f"Erreur lors de la requête vers {url}: {e}")
-        return None, None
+        # Charger la page avec Selenium
+        driver.get(page_url)
+        
+        # Récupérer les logs de la console
+        logs = driver.get_log("browser")
+        for log in logs:
+            if log["level"] == "SEVERE":
+                console_errors.append({"page": page_url, "error": log["message"]})
+        
+        # Récupérer toutes les ressources (JS, CSS, images) depuis le DOM
+        resources = []
+        
+        # JS
+        js_scripts = driver.find_elements("tag name", "script")
+        for script in js_scripts:
+            src = script.get_attribute("src")
+            if src:
+                resources.append((src, "js"))
+        
+        # CSS
+        css_links = driver.find_elements("tag name", "link")
+        for link in css_links:
+            href = link.get_attribute("href")
+            if href and "css" in link.get_attribute("rel"):
+                resources.append((href, "css"))
+        
+        # Images
+        images = driver.find_elements("tag name", "img")
+        for img in images:
+            src = img.get_attribute("src")
+            if src:
+                resources.append((src, "image"))
+        
+        # Vérifier le statut HTTP de chaque ressource
+        for resource_url, resource_type in resources:
+            try:
+                response = requests.head(resource_url, timeout=5, allow_redirects=True)
+                if 400 <= response.status_code < 600:
+                    resource_errors.append({
+                        "page_url": page_url,
+                        "resource_url": resource_url,
+                        "type": resource_type,
+                        "error": f"HTTP {response.status_code}"
+                    })
+            except requests.RequestException as e:
+                resource_errors.append({
+                    "page_url": page_url,
+                    "resource_url": resource_url,
+                    "type": resource_type,
+                    "error": f"Request failed: {str(e)}"
+                })
+                
+    except Exception as e:
+        console_errors.append({"page": page_url, "error": f"Selenium error: {str(e)}"})
+    
+    return resource_errors, console_errors
 
-# Fonction pour extraire les liens d'une page
-def extract_links(html, base_url):
-    soup = BeautifulSoup(html, "html.parser")
-    links = set()
-    for link in soup.find_all("a", href=True):
-        href = link["href"]
-        absolute_url = urljoin(base_url, href)
-        if (is_internal(absolute_url, base_url) and
-            absolute_url not in visited_urls and
-            not should_exclude(absolute_url)):
-            links.add(absolute_url)
-    return links
 
-# Fonction principale de crawl
-def crawl_site(start_url, max_pages):
-    queue = [start_url]
-    while queue and len(visited_urls) < max_pages:
-        current_url = queue.pop(0)
-        if current_url in visited_urls:
-            continue
-        visited_urls.add(current_url)
-        print(f"Crawling: {current_url}")
+# --- 3. Enregistrer les résultats en JSON ---
+def save_results(page_errors, resource_errors, console_errors, filename="results"):
+    """Enregistre les résultats dans un fichier JSON."""
+    timestamp = datetime.now().isoformat()
+    results = {
+        "timestamp": timestamp,
+        "page_errors": [{"url": url, "error": error} for url, error in page_errors],
+        "resource_errors": resource_errors,
+        "console_errors": console_errors
+    }
+    
+    with open(f"{filename}.json", 'w', encoding='utf-8') as file:
+        json.dump(results, file, indent=4, ensure_ascii=False)
+    
+    print(f"Résultats enregistrés dans {filename}.json")
 
-        status_code, html = crawl_page(current_url)
-        if status_code is None:
-            continue
 
-        if 500 <= status_code <= 599:
-            error_5xx_urls.append((current_url, status_code))
-            print(f"⚠️ Erreur 5xx trouvée: {current_url} (Code: {status_code})")
+# --- Fonction principale ---
+def main(start_url=START_URL, max_pages=MAX_PAGES):
+    """Exécute le crawl, la détection des erreurs et l'export des résultats."""
+    print(f"Début du crawl pour {start_url}...")
+    
+    # 1. Crawler le site et détecter les erreurs 5xx sur les pages
+    pages, page_errors = crawl_site(start_url, max_pages)
+    print(f"Pages crawlées : {len(pages)}")
+    print(f"Erreurs 5xx sur les pages : {len(page_errors)}")
+    
+    # 2. Initialiser Selenium et vérifier les ressources/erreurs console
+    driver = get_selenium_driver()
+    all_resource_errors = []
+    all_console_errors = []
+    
+    for page in pages:
+        print(f"Vérification des ressources et erreurs console pour : {page}")
+        resource_errors, console_errors = check_resources_and_console(page, driver)
+        all_resource_errors.extend(resource_errors)
+        all_console_errors.extend(console_errors)
+    
+    driver.quit()
+    print(f"Erreurs 4xx/5xx sur les ressources : {len(all_resource_errors)}")
+    print(f"Erreurs console : {len(all_console_errors)}")
+    
+    # 3. Enregistrer les résultats
+    save_results(page_errors, all_resource_errors, all_console_errors, filename="site_errors")
+    print("Traitement terminé.")
 
-        if status_code == 200 and html:
-            new_links = extract_links(html, BASE_URL)
-            for link in new_links:
-                if link not in visited_urls and link not in queue:
-                    queue.append(link)
 
-        time.sleep(DELAY)  # Respecter le délai
-
-    return error_5xx_urls
-
-# Lancer le crawl
+# --- Exécution ---
 if __name__ == "__main__":
-    start_url = urljoin(BASE_URL, START_PATH)
-    print(f"Début du crawl depuis {start_url}...")
-    errors = crawl_site(start_url, MAX_PAGES)
-
-    # Afficher les résultats
-    print("\n--- Résumé des erreurs 5xx ---")
-    for url, code in errors:
-        print(f"{url} → {code}")
-
-    print(f"\nTotal des pages visitées: {len(visited_urls)}")
-    print(f"Total des erreurs 5xx: {len(errors)}")
-
-# Export to CSV file
-def export_to_csv(errors, filename="erreurs_5xx.csv"):
-    with open(filename, mode="w", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file)
-        writer.writerow(["URL", "Code HTTP"])
-        for url, code in errors:
-            writer.writerow([url, code])
-    print(f"Les erreurs ont été exportées vers {filename}")
-
-# Appel à la fin du script
-export_to_csv(errors)
+    main(start_url=START_URL, max_pages=MAX_PAGES)
