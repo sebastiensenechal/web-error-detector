@@ -191,7 +191,7 @@ IGNORED_STATUS_CODES = {403, 429}
 4. Push et ouvre une Pull Request
 
 ## 📜 Licence
-MIT – Libre d'utilisation, modification et distribution.
+GNU Affero General Public v.3
 
 ## 📧 Support
 1. Vérifie outputs/crawler.log
