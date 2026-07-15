@@ -1,2 +1,5 @@
 [MASTER]
 init-hook='import sys; sys.path.append(".")'
+
+[MESSAGES CONTROL]
+disable=missing-module-docstring,missing-class-docstring,missing-function-docstring,line-too-long
