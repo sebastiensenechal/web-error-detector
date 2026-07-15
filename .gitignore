@@ -31,7 +31,6 @@ ENV/
 .env/
 .env.local
 .env.*.local
-.env
 
 # IDE
 # VS Code
