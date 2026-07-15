@@ -55,11 +55,11 @@ def save_results(
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=4, ensure_ascii=False)
 
-        logger.info(f"Results saved to {output_path}")
+        logger.info("Results saved to %s", output_path)
         return output_path
 
     except Exception as e:
-        logger.error(f"Failed to save results: {e}")
+        logger.error("Failed to save results: %s", e)
         raise
 
 
@@ -84,7 +84,7 @@ def main(
 
         # Crawler le site
         pages, page_errors = crawler.crawl(start_url, max_pages)
-        logger.info(f"Crawled {len(pages)} pages")
+        logger.info("Crawled {len(pages)} pages")
 
         if not pages:
             logger.warning("No pages crawled. Check your configuration.")
@@ -102,7 +102,7 @@ def main(
 
             # Vérifier chaque page
             for page in pages:
-                logger.info(f"Checking resources for: {page}")
+                logger.info("Checking resources for: {page}")
                 resource_errors, console_errors = resource_checker.check_page_resources(
                     page
                 )
@@ -110,9 +110,8 @@ def main(
                 all_console_errors.extend(console_errors)
 
             logger.info(
-                f"Found {len(all_resource_errors)} resource errors and "
-                f"{len(all_console_errors)} console errors"
-            )
+                "Found %d resource errors and %d console errors", len(all_resource_errors), len(all_console_errors)
+                )
 
         finally:
             driver.quit()
@@ -124,7 +123,7 @@ def main(
         logger.info("Processing completed successfully")
 
     except Exception as e:
-        logger.error(f"Application error: {e}", exc_info=True)
+        logger.error("Application error: %s", e, exc_info=True)
         raise
 
 

@@ -80,11 +80,11 @@ LOG_FILE=outputs/crawler.log
 ## 🚀 Utilisation
 ### Commande de base
 ```bash
-python src/main.py
+python -m src.main
 ```
 ### Avec arguments
 ```bash
-python src/scripts/run.py --url https://example.com --max-pages 10 --output mon_rapport --verbose
+python -m src.scripts.run --url https://example.com --max-pages 10 --output mon_rapport --verbose
 ```
 
 ### Options
