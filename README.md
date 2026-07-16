@@ -126,7 +126,7 @@ web_error_detector/
 {
   "metadata": {
     "timestamp": "2026-07-09T15:00:00.000000",
-    "start_url": "https://www.cnrs.fr/fr/",
+    "start_url": "https://www.lorem.fr/",
     "max_pages": 20
   },
   "stats": {
