@@ -84,7 +84,7 @@ def main(
 
         # Crawler le site
         pages, page_errors = crawler.crawl(start_url, max_pages)
-        logger.info("Crawled {len(pages)} pages")
+        logger.info("Crawled %d pages", len(pages))
 
         if not pages:
             logger.warning("No pages crawled. Check your configuration.")
@@ -102,7 +102,7 @@ def main(
 
             # Vérifier chaque page
             for page in pages:
-                logger.info("Checking resources for: {page}")
+                logger.info("Checking resources for: %s", page)
                 resource_errors, console_errors = resource_checker.check_page_resources(
                     page
                 )
