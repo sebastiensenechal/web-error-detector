@@ -2,18 +2,20 @@
 
 > **Outil avancé de détection d'erreurs web** – Crawle des sites, vérifie les codes HTTP (4xx/5xx) sur les pages et ressources (JS, CSS, images), et capture les erreurs console du navigateur.
 > **Optimisé avec parallélisation** pour des performances accrues.
+> **Prend en charge l'authentification Basic Auth** pour les environnements protégés (préproduction, tests).
 
 ---
 
 ## 🚀 Fonctionnalités
-   Fonctionnalité | Description |
- |---------------|-------------|
- | 🕸️ **Crawling parallèle** | Exploration rapide des pages avec `ThreadPoolExecutor` |
- | 🔍 **Vérification des ressources** | Détection des erreurs HTTP (4xx/5xx) sur les ressources JS, CSS, images, polices |
- | 💻 **Capture des erreurs console** | Récupération des erreurs JavaScript et warnings du navigateur |
- | 📊 **Export structuré** | Résultats au format JSON avec métadonnées et statistiques |
- | ⚡ **Performances** | Parallélisation du crawl et des vérifications de ressources |
- | 🛡️ **Robuste et sécurisé** | Gestion d'erreurs, timeouts configurables, validation des URLs |
+| Fonctionnalité | Description |
+|---------------|-------------|
+| 🕸️ **Crawling parallèle** | Exploration rapide des pages avec `ThreadPoolExecutor` |
+| 🔍 **Vérification des ressources** | Détection des erreurs HTTP (4xx/5xx) sur les ressources JS, CSS, images, polices |
+| 💻 **Capture des erreurs console** | Récupération des erreurs JavaScript et warnings du navigateur |
+| 📊 **Export structuré** | Résultats au format JSON avec métadonnées et statistiques |
+| ⚡ **Performances** | Parallélisation du crawl et des vérifications de ressources |
+| 🛡️ **Robuste et sécurisé** | Gestion d'erreurs, timeouts configurables, validation des URLs |
+| 🔐 **Authentification Basic Auth** | Prise en charge des sites protégés par authentification HTTP de base |
 
 ---
 
@@ -62,6 +64,8 @@ START_URL=https://www.lorem.fr/
 MAX_PAGES=20
 MAX_DEPTH=3
 REQUEST_TIMEOUT=10
+SCROLL_DELAY=5
+RESOURCE_TIMEOUT=3
 
 # Parallélisation
 MAX_WORKERS=4
@@ -75,7 +79,32 @@ RESOURCE_TIMEOUT=3
 # Logging
 LOG_LEVEL=INFO
 LOG_FILE=outputs/crawler.log
+
+# Activer l'authentification Basic Auth pour les requêtes HTTP (crawler et ressources)
+BASIC_AUTH_ENABLED=false
+
+# Identifiant pour l'authentification Basic Auth
+BASIC_AUTH_USERNAME=
+
+# Mot de passe pour l'authentification Basic Auth
+BASIC_AUTH_PASSWORD=
 ```
+
+## Configuration pour les sites protégés
+Pour utiliser l'authentification Basic Auth :
+
+1. Activez l'authentification dans .env :
+```bash
+ BASIC_AUTH_ENABLED=true
+ BASIC_AUTH_USERNAME=votre_utilisateur
+ BASIC_AUTH_PASSWORD=votre_mot_de_passe
+ ```
+ 2. Pour Selenium (nécessaire pour le crawling complet) :
+ - Option 1 (recommandée) : Intégrez les identifiants dans l'URL de départ : 'username:password@https://lorem.fr'
+ - Option 2 : Utilisez une extension navigateur pour Basic Auth
+
+⚠️ Important : Les identifiants dans .env sont utilisés par le crawler HTTP (requests), mais Selenium nécessite une configuration séparée.
+
 
 ## 🚀 Utilisation
 ### Commande de base
@@ -100,10 +129,10 @@ python -m src.scripts.run --url https://example.com --max-pages 10 --output mon_
 web_error_detector/
 ├── src/
 │   ├── config/
-│   │   └── settings.py
+│   │   └── settings.py          # Configuration (inclut Basic Auth)
 │   ├── crawler/
-│   │   ├── crawler.py
-│   │   └── resource_checker.py
+│   │   ├── crawler.py           # Crawler avec Basic Auth
+│   │   └── resource_checker.py  # Vérificateur de ressources avec Basic Auth
 │   ├── console/
 │   │   └── error_catcher.py
 │   ├── utils/
@@ -125,9 +154,10 @@ web_error_detector/
 ```bash
 {
   "metadata": {
-    "timestamp": "2026-07-09T15:00:00.000000",
+    "timestamp": "2026-07-20T15:00:00.000000",
     "start_url": "https://www.lorem.fr/",
-    "max_pages": 20
+    "max_pages": 20,
+    "basic_auth_enabled": true
   },
   "stats": {
     "pages_crawled": 20,
@@ -160,14 +190,47 @@ IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp"}
 IGNORED_STATUS_CODES = {403, 429}
 ```
 
+## Désactiver Basic Auth pour certains domaines
+```bash
+# src/config/settings.py
+# Ajoutez dans la classe Settings
+BASIC_AUTH_EXCLUDED_DOMAINS = {"cdn.public.com", "static.example.com"}
+```
+
+## 🔐 Utilisation de l'authentification Basic Auth
+### Cas d'usage
+- Environnements de préproduction protégés
+- Sites de test avec restriction d'accès
+- API internes nécessitant une authentification
+
+### Exemple complet
+```bash
+# Dans .env
+START_URL=https://preprod.lorem.fr/
+BASIC_AUTH_ENABLED=true
+BASIC_AUTH_USERNAME=test_user
+BASIC_AUTH_PASSWORD=test_pass123
+
+# Pour Selenium, modifiez START_URL
+START_URL=https://test_user:test_pass123@preprod.lorem.fr/
+```
+
+## Bonnes pratiques de sécurité
+- Ne jamais commiter .env avec des identifiants (il est dans .gitignore)
+- Utiliser des variables d'environnement système en production
+- Rotater les identifiants régulièrement
+- Limiter les permissions de l'utilisateur Basic Auth
+
 ## 🐛 Résolution des problèmes
-| Erreur | Cause | Solution |
-| --- | --- | --- |
-| No scheme supplied | URL relative | Vérifier START_URL dans .env (pas de hhttps://) |
-| ChromeDriver version mismatch | Version incompatible | Mettre à jour Chrome ou forcer une version de ChromeDriver |
-| 405 Method Not Allowed | CDN bloquant HEAD | Le code utilise GET à la place. Ignorer le domaine dans IGNORED_DOMAINS |
-| Lenteur | Trop de requêtes séquentielles | Augmenter MAX_WORKERS (ex: 8) et réduire RESOURCE_TIMEOUT (ex: 2) |
-| Aucune page crawlée | URL invalide ou site bloquant | Vérifier START_URL et le User-Agent |
+ | Erreur | Cause | Solution |
+ | --- | --- | --- |
+ | No scheme supplied | URL relative | Vérifier START_URL dans .env (doit commencer par http:// ou https://) |
+ | ChromeDriver version mismatch | Version incompatible | Mettre à jour Chrome ou forcer une version de ChromeDriver |
+ | 405 Method Not Allowed | CDN bloquant HEAD | Le code utilise GET à la place. Ignorer le domaine dans IGNORED_DOMAINS |
+ | Lenteur | Trop de requêtes séquentielles | Augmenter MAX_WORKERS (ex: 8) et réduire RESOURCE_TIMEOUT (ex: 2) |
+ | Aucune page crawlée | URL invalide ou site bloquant | Vérifier START_URL et le User-Agent |
+ | 401 Unauthorized | Basic Auth manquant | Vérifier BASIC_AUTH_ENABLED, USERNAME et PASSWORD dans .env |
+ | 403 Forbidden | Basic Auth incorrect | Vérifier les identifiants et START_URL pour Selenium |
 
 ## 📊 Performances
 | Workers | Pages/secondes | Temps pour 20 pages |
