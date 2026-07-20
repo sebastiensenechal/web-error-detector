@@ -43,6 +43,14 @@ def get_driver() -> webdriver.Chrome:
     options.add_argument("--allow-insecure-localhost")
     options.add_argument("--allow-running-insecure-content")
 
+    # Après les options.add_argument(...)
+    if settings.BASIC_AUTH_ENABLED and settings.BASIC_AUTH_USERNAME and settings.BASIC_AUTH_PASSWORD: # pylint: disable=no-member
+        logger.warning(
+            "Selenium does not natively support Basic Auth. "
+            "Please either: (1) Prepend 'username:password@' to START_URL in .env, "
+            "or (2) Use a Basic Auth browser extension."
+        )
+
     try:
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=options)
