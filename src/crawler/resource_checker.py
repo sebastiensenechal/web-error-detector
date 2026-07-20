@@ -1,5 +1,6 @@
 """Module de vérification des ressources (JS, CSS, images)."""
 import requests
+from requests.auth import HTTPBasicAuth
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urljoin
@@ -19,6 +20,16 @@ class ResourceChecker:
             "User-Agent": settings.USER_AGENT,
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
         })
+    
+    # ====================================================================
+    # Ajout de l'authentification Basic Auth si activée
+    # ====================================================================
+        if settings.BASIC_AUTH_ENABLED and settings.BASIC_AUTH_USERNAME and settings.BASIC_AUTH_PASSWORD: # pylint: disable=no-member
+            self.session.auth = HTTPBasicAuth(
+                settings.BASIC_AUTH_USERNAME, # pylint: disable=no-member
+                settings.BASIC_AUTH_PASSWORD # pylint: disable=no-member
+            )
+            logger.info("Basic Auth enabled for resource checker")
 
     def _make_absolute_url(self, base_url: str, url: str) -> Optional[str]:
         """Convertit une URL relative en absolue si nécessaire."""
