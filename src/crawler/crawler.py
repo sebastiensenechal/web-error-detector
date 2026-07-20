@@ -1,15 +1,26 @@
 """Module de crawling du site web."""
-import requests
-from requests.auth import HTTPBasicAuth
-from bs4 import BeautifulSoup
+import base64
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional, Tuple
 from urllib.parse import urljoin
+
+import requests
+from requests.auth import HTTPBasicAuth
+from bs4 import BeautifulSoup
 
 from src.config.settings import settings
 from src.utils.logger import logger
 from src.utils.url_utils import clean_url, is_same_domain, is_valid_url, normalize_url
 
+class UTF8HTTPBasicAuth(HTTPBasicAuth):
+    """Basic Auth avec support UTF-8 pour les mots de passe avec caractères spéciaux."""
+    def __call__(self, r):
+        auth_str = f"{self.username}:{self.password}"
+        encoded_auth = base64.b64encode(auth_str.encode('utf-8')).decode('ascii')
+        r.headers['Authorization'] = f"Basic {encoded_auth}"
+        return r
+    
 class SiteCrawler:
     """Crawler de site web avec détection d'erreurs 5xx."""
 
@@ -21,13 +32,10 @@ class SiteCrawler:
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": settings.USER_AGENT})
     
-    # ====================================================================
-    # Ajout de l'authentification Basic Auth si activée
-    # ====================================================================
-        if settings.BASIC_AUTH_ENABLED and settings.BASIC_AUTH_USERNAME and settings.BASIC_AUTH_PASSWORD:  # pylint: disable=no-member
-            self.session.auth = HTTPBasicAuth(
-                settings.BASIC_AUTH_USERNAME,  # pylint: disable=no-member
-                settings.BASIC_AUTH_PASSWORD   # pylint: disable=no-member
+        if settings.BASIC_AUTH_ENABLED and settings.BASIC_AUTH_USERNAME and settings.BASIC_AUTH_PASSWORD:
+            self.session.auth = UTF8HTTPBasicAuth(
+                settings.BASIC_AUTH_USERNAME,
+                settings.BASIC_AUTH_PASSWORD
             )
             logger.info("Basic Auth enabled for crawler")
 

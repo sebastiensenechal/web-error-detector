@@ -91,7 +91,9 @@ BASIC_AUTH_PASSWORD=
 ```
 
 ## Configuration pour les sites protégés
-Pour utiliser l'authentification Basic Auth :
+Pour utiliser l'authentification Basic Auth, appliquez ce qui suit.
+
+⚠️ Important : Les identifiants dans .env sont utilisés par le crawler HTTP (requests), mais Selenium nécessite une configuration séparée.
 
 1. Activez l'authentification dans .env :
 ```bash
@@ -99,11 +101,9 @@ Pour utiliser l'authentification Basic Auth :
  BASIC_AUTH_USERNAME=votre_utilisateur
  BASIC_AUTH_PASSWORD=votre_mot_de_passe
  ```
- 2. Pour Selenium (nécessaire pour le crawling complet) :
- - Option 1 (recommandée) : Intégrez les identifiants dans l'URL de départ : 'username:password@https://lorem.fr'
- - Option 2 : Utilisez une extension navigateur pour Basic Auth
-
-⚠️ Important : Les identifiants dans .env sont utilisés par le crawler HTTP (requests), mais Selenium nécessite une configuration séparée.
+2. Pour Selenium (nécessaire pour le crawling complet) :
+- Option 1 : Utilisez une extension navigateur pour Basic Auth
+- Option 2 : Intégrez les identifiants dans l'URL de départ : 'https://username:password@lorem.fr'
 
 
 ## 🚀 Utilisation

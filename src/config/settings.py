@@ -62,16 +62,10 @@ class Settings:
     # Codes HTTP à ignorer (optionnel)
     IGNORED_STATUS_CODES: set = set()
 
-
-# ========================================================================
-# Authentification Basic Auth
-# ========================================================================
-# Activer/désactiver l'authentification Basic Auth
-BASIC_AUTH_ENABLED: bool = os.getenv("BASIC_AUTH_ENABLED", "false").lower() == "true"
-
-# Identifiants pour l'authentification Basic Auth
-BASIC_AUTH_USERNAME: Optional[str] = os.getenv("BASIC_AUTH_USERNAME")
-BASIC_AUTH_PASSWORD: Optional[str] = os.getenv("BASIC_AUTH_PASSWORD")
+    # Authentification Basic Auth
+    BASIC_AUTH_ENABLED: bool = os.getenv("BASIC_AUTH_ENABLED", "false").lower() == "true"
+    BASIC_AUTH_USERNAME: Optional[str] = os.getenv("BASIC_AUTH_USERNAME")
+    BASIC_AUTH_PASSWORD: Optional[str] = os.getenv("BASIC_AUTH_PASSWORD")
 
 
 # Instance globale
