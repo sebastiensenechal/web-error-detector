@@ -1,9 +1,13 @@
 """Module de vérification des ressources (JS, CSS, images)."""
-import requests
-from requests.auth import HTTPBasicAuth
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urljoin
+
+import re
+import time
+
+import requests
+from requests.auth import HTTPBasicAuth
 
 from selenium.webdriver.remote.webdriver import WebDriver
 
@@ -20,10 +24,8 @@ class ResourceChecker:
             "User-Agent": settings.USER_AGENT,
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
         })
-    
-    # ====================================================================
-    # Ajout de l'authentification Basic Auth si activée
-    # ====================================================================
+
+        # Ajout de l'authentification Basic Auth si activée
         if settings.BASIC_AUTH_ENABLED and settings.BASIC_AUTH_USERNAME and settings.BASIC_AUTH_PASSWORD: # pylint: disable=no-member
             self.session.auth = HTTPBasicAuth(
                 settings.BASIC_AUTH_USERNAME, # pylint: disable=no-member
@@ -39,8 +41,8 @@ class ResourceChecker:
             return url
         try:
             return urljoin(base_url, url)
-        except Exception as e:
-            logger.warning(f"Failed to make absolute URL from {url} (base: {base_url}): {e}")
+        except (ValueError, TypeError) as e:
+            logger.warning("Failed to make absolute URL from %s (base: %s): %s", url, base_url, e)
             return None
 
     def _check_resource(self, resource_url: str, resource_type: str) -> Optional[Dict]:
@@ -73,7 +75,7 @@ class ResourceChecker:
         resources = set()
         try:
             self.driver.get(page_url)
-            logger.debug(f"Loading page: {page_url}")
+            logger.debug("Loading page: %s", page_url)
 
             # Scroll pour charger les ressources dynamiques
             self._scroll_to_bottom()
@@ -87,7 +89,10 @@ class ResourceChecker:
                         resources.add((absolute_url, "js"))
 
             # === 2. Feuilles de style CSS (correction du bug original) ===
-            for link in self.driver.find_elements("xpath", "//link[@rel='stylesheet' or contains(@rel, 'style')]"):
+            for link in self.driver.find_elements(
+                "xpath",
+                "//link[@rel='stylesheet' or contains(@rel, 'style')]"
+            ):
                 href = link.get_attribute("href")
                 if href:
                     absolute_url = self._make_absolute_url(page_url, href)
@@ -103,7 +108,6 @@ class ResourceChecker:
                         resources.add((absolute_url, "image"))
 
             # === 4. Images de fond (background-image) ===
-            import re
             elements_with_bg = self.driver.find_elements(
                 "xpath", "//*[contains(@style, 'background-image')]"
             )
@@ -123,16 +127,15 @@ class ResourceChecker:
                     if absolute_url:
                         resources.add((absolute_url, "icon"))
 
-            logger.debug(f"Found {len(resources)} resources on {page_url}")
+            logger.debug("Found %d resources on %s", len(resources), page_url)
             return list(resources)
 
-        except Exception as e:
-            logger.error(f"Error extracting resources from {page_url}: {e}")
+        except (requests.exceptions.RequestException, ValueError, AttributeError) as e:
+            logger.error("Error extracting resources from %s: %s", page_url, e)
             return []
 
     def _scroll_to_bottom(self):
         """Scroll jusqu'en bas de la page pour charger les ressources dynamiques."""
-        import time
         last_height = self.driver.execute_script("return document.body.scrollHeight")
         for _ in range(3):  # Max 3 scrolls
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -170,8 +173,8 @@ class ResourceChecker:
                         error["page"] = page_url
                         resource_errors.append(error)
 
-        except Exception as e:
-            logger.error(f"Error checking resources for {page_url}: {e}")
+        except (requests.exceptions.RequestException, ValueError) as e:
+            logger.error("Error checking resources for %s: %s", page_url, e)
 
         return resource_errors, console_errors
 
@@ -187,6 +190,6 @@ class ResourceChecker:
                         "level": log["level"],
                         "message": log["message"],
                     })
-        except Exception as e:
-            logger.error(f"Error getting console errors for {page_url}: {e}")
+        except (requests.exceptions.RequestException, ValueError) as e:
+            logger.error("Error getting console errors for %s: %s", page_url, e)
         return console_errors
