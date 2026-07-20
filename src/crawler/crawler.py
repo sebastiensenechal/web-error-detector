@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 from src.config.settings import settings
 from src.utils.logger import logger
-from src.utils.url_utils import clean_url, is_same_domain, is_valid_url, normalize_url
+from src.utils.url_utils import is_same_domain, is_valid_url, normalize_url
 
 class UTF8HTTPBasicAuth(HTTPBasicAuth):
     """Basic Auth avec support UTF-8 pour les mots de passe avec caractères spéciaux."""
@@ -20,7 +20,7 @@ class UTF8HTTPBasicAuth(HTTPBasicAuth):
         encoded_auth = base64.b64encode(auth_str.encode('utf-8')).decode('ascii')
         r.headers['Authorization'] = f"Basic {encoded_auth}"
         return r
-    
+
 class SiteCrawler:
     """Crawler de site web avec détection d'erreurs 5xx."""
 
@@ -31,7 +31,7 @@ class SiteCrawler:
         self.page_errors: list = []
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": settings.USER_AGENT})
-    
+
         if settings.BASIC_AUTH_ENABLED and settings.BASIC_AUTH_USERNAME and settings.BASIC_AUTH_PASSWORD:
             self.session.auth = UTF8HTTPBasicAuth(
                 settings.BASIC_AUTH_USERNAME,
@@ -42,7 +42,7 @@ class SiteCrawler:
     def _process_page(self, url: str) -> Tuple[str, Optional[str]]:
         """Traite une page unique et retourne (url, erreur ou None)."""
         try:
-            logger.debug(f"Crawling: {url}")
+            logger.debug("Crawling: %s", url)
             response = self.session.get(
                 url,
                 timeout=settings.REQUEST_TIMEOUT,
@@ -50,15 +50,15 @@ class SiteCrawler:
             )
             if response.status_code >= 500:
                 error_msg = f"HTTP {response.status_code}"
-                logger.error(f"Page error {response.status_code}: {url}")
+                logger.error("Page error %d: %s", response.status_code, url)
                 return (url, error_msg)
             if response.status_code >= 400:
-                logger.warning(f"Page warning {response.status_code}: {url}")
+                logger.warning("Page warning %d: %s", response.status_code, url)
                 return (url, f"HTTP {response.status_code}")
             return (url, None)
         except requests.exceptions.RequestException as e:
             error_msg = f"Request failed: {str(e)}"
-            logger.error(f"Request error for {url}: {e}")
+            logger.error("Request error for %s: %s", url, e)
             return (url, error_msg)
 
     def _extract_links(self, url: str) -> list:
@@ -81,8 +81,8 @@ class SiteCrawler:
                 ):
                     links.add(next_url)
             return list(links)
-        except Exception as e:
-            logger.error(f"Error extracting links from {url}: {e}")
+        except (requests.exceptions.RequestException, ValueError, AttributeError) as e:
+            logger.error("Error extracting links from %s: %s", url, e)
             return []
 
     def crawl(self, start_url: Optional[str] = None, max_pages: Optional[int] = None) -> Tuple[list, list]:
@@ -95,7 +95,7 @@ class SiteCrawler:
         self.pages = []
         self.page_errors = []
 
-        logger.info(f"Starting crawl from {start_url}, max pages: {max_pages}")
+        logger.info("Starting crawl from %s, max pages: %d", start_url, max_pages)
 
         with ThreadPoolExecutor(max_workers=settings.MAX_WORKERS) as executor:
             futures = {}
@@ -122,7 +122,7 @@ class SiteCrawler:
                             # Découvrir de nouvelles URLs depuis cette page
                             new_links = self._extract_links(url)
                             self.to_visit.extend(new_links)
-                            logger.debug(f"Discovered {len(new_links)} new links from {url}")
+                            logger.debug("Discovered %d new links from %s", len(new_links), url)
 
-        logger.info(f"Crawled {len(self.pages)} pages, found {len(self.page_errors)} errors")
+        logger.info("Crawled %d pages, found %d errors", len(self.pages), len(self.page_errors))
         return self.pages, self.page_errors
