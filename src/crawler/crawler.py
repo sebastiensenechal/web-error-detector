@@ -1,5 +1,6 @@
 """Module de crawling du site web."""
 import requests
+from requests.auth import HTTPBasicAuth
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional, Tuple
@@ -19,6 +20,16 @@ class SiteCrawler:
         self.page_errors: list = []
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": settings.USER_AGENT})
+    
+    # ====================================================================
+    # Ajout de l'authentification Basic Auth si activée
+    # ====================================================================
+        if settings.BASIC_AUTH_ENABLED and settings.BASIC_AUTH_USERNAME and settings.BASIC_AUTH_PASSWORD:  # pylint: disable=no-member
+            self.session.auth = HTTPBasicAuth(
+                settings.BASIC_AUTH_USERNAME,  # pylint: disable=no-member
+                settings.BASIC_AUTH_PASSWORD   # pylint: disable=no-member
+            )
+            logger.info("Basic Auth enabled for crawler")
 
     def _process_page(self, url: str) -> Tuple[str, Optional[str]]:
         """Traite une page unique et retourne (url, erreur ou None)."""
