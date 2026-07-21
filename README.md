@@ -1,17 +1,17 @@
 # 🔍 Web Error Detector
 
-> **Outil avancé de détection d'erreurs web** – Crawle des sites, vérifie les codes HTTP (4xx/5xx) sur les pages et ressources (JS, CSS, images), et capture les erreurs console du navigateur.
-> **Optimisé avec parallélisation** pour des performances accrues.
+> **Outil de détection d'erreurs web** – Crawle des sites, vérifie les codes HTTP (4xx/5xx) sur les pages et ressources (JS, CSS, images), et capture les erreurs console du navigateur.
+> **Avec parallélisation** pour des performances accrues.
 > **Prend en charge l'authentification Basic Auth** pour les environnements protégés (préproduction, tests).
 
 ---
 
-## 🚀 Fonctionnalités
+## 🚀 Caractéristiques / Fonctionnalités
 | Fonctionnalité | Description |
 |---------------|-------------|
 | 🕸️ **Crawling parallèle** | Exploration rapide des pages avec `ThreadPoolExecutor` |
 | 🔍 **Vérification des ressources** | Détection des erreurs HTTP (4xx/5xx) sur les ressources JS, CSS, images, polices |
-| 💻 **Capture des erreurs console** | Récupération des erreurs JavaScript et warnings du navigateur |
+| 💻 **Capture des erreurs en console** | Récupération des erreurs JavaScript et warnings du navigateur |
 | 📊 **Export structuré** | Résultats au format JSON avec métadonnées et statistiques |
 | ⚡ **Performances** | Parallélisation du crawl et des vérifications de ressources |
 | 🛡️ **Robuste et sécurisé** | Gestion d'erreurs, timeouts configurables, validation des URLs |
@@ -201,7 +201,6 @@ BASIC_AUTH_EXCLUDED_DOMAINS = {"cdn.public.com", "static.example.com"}
 ### Cas d'usage
 - Environnements de préproduction protégés
 - Sites de test avec restriction d'accès
-- API internes nécessitant une authentification
 
 ### Exemple complet
 ```bash
@@ -211,15 +210,14 @@ BASIC_AUTH_ENABLED=true
 BASIC_AUTH_USERNAME=test_user
 BASIC_AUTH_PASSWORD=test_pass123
 
-# Pour Selenium, modifiez START_URL
+# Pour Selenium, utilisez une extension Chrome de Basic Auth, ou modifiez START_URL si vous préférez
 START_URL=https://test_user:test_pass123@preprod.lorem.fr/
 ```
 
 ## Bonnes pratiques de sécurité
 - Ne jamais commiter .env avec des identifiants (il est dans .gitignore)
 - Utiliser des variables d'environnement système en production
-- Rotater les identifiants régulièrement
-- Limiter les permissions de l'utilisateur Basic Auth
+- Changez les identifiants régulièrement
 
 ## 🐛 Résolution des problèmes
  | Erreur | Cause | Solution |
